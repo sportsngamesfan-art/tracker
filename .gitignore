@@ -1,0 +1,10 @@
+node_modules/
+.next/
+.codex/
+generated_images/
+*.tsbuildinfo
+.env*
+.vercel/
+public/media/*-original.jpg
+public/kane-cutout.png
+public/kane-original.jpg
