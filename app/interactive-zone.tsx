@@ -115,6 +115,7 @@ export function CareerQuiz() {
               {q.options.map((option, i) => (
                 <button
                   key={option}
+                  aria-label={`${"ABCD"[i]} ${option}`}
                   disabled={answer !== null}
                   className={
                     answer !== null && i === q.correct
