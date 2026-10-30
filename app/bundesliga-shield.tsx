@@ -7,6 +7,7 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 export default function BundesligaShield() {
   const hostRef = useRef<HTMLDivElement>(null);
   const controls = useRef({ angle: -0.22, zoom: 5.3, rotating: false });
+  const redraw = useRef<() => void>(() => {});
   const [paused, setPaused] = useState(true);
   const [failed, setFailed] = useState(false);
   useEffect(() => {
@@ -109,6 +110,7 @@ export default function BundesligaShield() {
       camera.lookAt(0, 0, 0);
       renderer.render(scene, camera);
     };
+    redraw.current = draw;
     const resize = () => {
       const w = Math.max(1, host.clientWidth), h = Math.max(1, host.clientHeight);
       renderer.setSize(w, h, false);
@@ -162,22 +164,15 @@ export default function BundesligaShield() {
       [silver, polished, dark, gold].forEach(m => m.dispose());
       environment.dispose();
       renderer.dispose();
+      redraw.current = () => {};
       renderer.domElement.remove();
     };
   }, []);
 
   const rotate = (delta: number) => {
     controls.current.angle += delta;
-    // Rotation redraws on next scheduled frame, or by a scoped custom event.
-    hostRef.current?.dispatchEvent(new Event("resize"));
-    setTick(v => v + 1);
+    redraw.current();
   };
-  const [tick, setTick] = useState(0);
-  useEffect(() => {
-    // Trigger an explicit render for button controls even while auto rotation is paused.
-    const canvas = hostRef.current?.querySelector("canvas");
-    if (canvas) canvas.dispatchEvent(new Event("pointermove"));
-  }, [tick]);
   return (
     <div className="bundesliga-exhibit">
       <div className="bundesliga-exhibit-copy">
@@ -195,7 +190,7 @@ export default function BundesligaShield() {
         {!failed && <div className="bundesliga-controls">
           <button type="button" onClick={() => rotate(-0.35)} aria-label="Rotate shield left">←</button>
           <button type="button" onClick={() => rotate(0.35)} aria-label="Rotate shield right">→</button>
-          <button type="button" onClick={() => { controls.current.zoom = Math.max(3.8, controls.current.zoom - 0.35); setTick(v => v + 1); }} aria-label="Zoom in">+</button>
+          <button type="button" onClick={() => { controls.current.zoom = Math.max(3.8, controls.current.zoom - 0.35); redraw.current(); }} aria-label="Zoom in">+</button>
           <button type="button" onClick={() => { controls.current.zoom = Math.min(7, controls.current.zoom + 0.35); setTick(v => v + 1); }} aria-label="Zoom out">−</button>
           <button type="button" onClick={() => { controls.current.rotating = paused; setPaused(!paused); }}>{paused ? "Auto rotate" : "Pause rotation"}</button>
         </div>}
