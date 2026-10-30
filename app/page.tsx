@@ -1,4 +1,5 @@
 import Image from "next/image";
+import BundesligaShield from "./bundesliga-shield";
 import { Origins } from "./origins";
 import { CareerQuiz, InteractiveZone } from "./interactive-zone";
 import {
@@ -416,6 +417,7 @@ export default function Home() {
             </p>
           </div>
         </div>
+        <BundesligaShield />
       </section>
 
       <section id="fan-zone" className="numbers chapter-pad">
